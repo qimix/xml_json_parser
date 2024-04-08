@@ -38,7 +38,6 @@ public class Main {
             Document doc = builder.parse(new File(xmlFileName));
             Node root = doc.getDocumentElement();
             NodeList nodeList = root.getChildNodes();
-            NodeList children = root.getChildNodes();
             System.out.println( "Корневой элемент: " + root.getNodeName());
             read(root);
 
