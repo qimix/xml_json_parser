@@ -18,34 +18,36 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        //String[] columnMapping = {"id", "firstName", "lastName", "country", "age"};
-       // String fileName = "data.csv";
-       // String jsonFileName = "data.json";
-       // List<Employee> list = parseCSV(columnMapping, fileName);
-       // String json = listToJson(list);
-       // writeString(json, jsonFileName);
-
         String xmlFile = "data.xml";
         List<Employee> list = parseXML(xmlFile);
     }
 
     protected static List<Employee> parseXML(String xmlFileName) {
-        List<Employee> staff = new ArrayList<Employee>();
-
+        List<Employee> list = new ArrayList<Employee>();
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
-            Document doc = builder.parse(new File(xmlFileName));
-            Node root = doc.getDocumentElement();
-            NodeList nodeList = root.getChildNodes();
-            System.out.println( "Корневой элемент: " + root.getNodeName());
-            read(root);
+            Document document = builder.parse(new File(xmlFileName));
+            Element element = document.getDocumentElement();
+            NodeList nodeList = element.getChildNodes();
+
+            for(int i = 0; i < nodeList.getLength(); i++) {
+                NodeList nodeList1 = nodeList.item(i).getChildNodes();
+                if(Node.ELEMENT_NODE == nodeList.item(i).getNodeType()) {
+                    for (int s = 0; s < nodeList1.getLength(); s++) {
+                        if(nodeList1.item(s).hasChildNodes()){
+                            Element element1 = (Element) nodeList1.item(s);
+                            System.out.println(nodeList1.item(s).getNodeName() + " - " + nodeList1.item(s).getTextContent());
+                        }
+                    }
+                }
+            }
 
         } catch (ParserConfigurationException | IOException | SAXException ex){
             ex.printStackTrace();
         }
 
-        return staff;
+        return list;
     }
 
     private static void read(Node node) {
