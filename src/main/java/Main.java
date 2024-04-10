@@ -5,7 +5,10 @@ import com.opencsv.CSVReader;
 import com.opencsv.bean.ColumnPositionMappingStrategy;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -14,16 +17,19 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Main {
     public static void main(String[] args) {
         String xmlFile = "data.xml";
         List<Employee> list = parseXML(xmlFile);
+        writeString(listToJson(list), "employee.json");
     }
 
     protected static List<Employee> parseXML(String xmlFileName) {
-        List<Employee> list = new ArrayList<Employee>();
+        List<Employee> employee = new ArrayList<Employee>();
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
@@ -31,43 +37,23 @@ public class Main {
             Element element = document.getDocumentElement();
             NodeList nodeList = element.getChildNodes();
 
-            for(int i = 0; i < nodeList.getLength(); i++) {
+            for (int i = 0; i < nodeList.getLength(); i++) {
                 NodeList nodeList1 = nodeList.item(i).getChildNodes();
-                if(Node.ELEMENT_NODE == nodeList.item(i).getNodeType()) {
+                if (Node.ELEMENT_NODE == nodeList.item(i).getNodeType()) {
+                    Map<String, String> map = new HashMap<>();
                     for (int s = 0; s < nodeList1.getLength(); s++) {
-                        if(nodeList1.item(s).hasChildNodes()){
-                            Element element1 = (Element) nodeList1.item(s);
-                            System.out.println(nodeList1.item(s).getNodeName() + " - " + nodeList1.item(s).getTextContent());
+                        if (nodeList1.item(s).hasChildNodes()) {
+                            map.put(nodeList1.item(s).getNodeName(), nodeList1.item(s).getTextContent());
                         }
                     }
+                    employee.add(new Employee(Long.parseLong(map.get("id")), map.get("firstName"), map.get("lastName"), map.get("country"), Integer.parseInt(map.get("age"))));
                 }
             }
-
-        } catch (ParserConfigurationException | IOException | SAXException ex){
+        } catch (ParserConfigurationException | IOException | SAXException ex) {
             ex.printStackTrace();
         }
-
-        return list;
+        return employee;
     }
-
-    private static void read(Node node) {
-        NodeList nodeList = node.getChildNodes();
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Node node_ = nodeList.item(i);
-            if (Node.ELEMENT_NODE == node_.getNodeType()) {
-                System. out.println( "Текущий узел: " + node_.getNodeName());
-                Element element = (Element) node_;
-                NamedNodeMap map = element.getAttributes();
-                for (int a = 0; a < map.getLength(); a++) {
-                    String attrName = map.item(a).getNodeName();
-                    String attrValue = map.item(a).getNodeValue();
-                    System. out.println( "Атрибут: " + attrName + "; значение: " + attrValue);
-                }
-                read(node_);
-            }
-        }
-    }
-
 
     protected static List<Employee> parseCSV(String[] columnMapping, String fileName) {
         List<Employee> staff = new ArrayList<Employee>();
