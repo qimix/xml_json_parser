@@ -75,12 +75,12 @@ public class Main {
         return staff;
     }
 
-    protected static String listToJson(List<Employee> staff) {
+    protected static String listToJson(List<Employee> list) {
         GsonBuilder gsonBuilder = new GsonBuilder();
         Gson gson = new Gson();
         Type listType = new TypeToken<List<Employee>>() {
         }.getType();
-        String json = gson.toJson(staff, listType);
+        String json = gson.toJson(list, listType);
         return json;
     }
 
